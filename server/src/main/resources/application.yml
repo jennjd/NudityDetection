@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: en-creep-t
+  http:
+    multipart:
+      maxFileSize: 4096MB
+      maxRequestSize: 4096MB
+  mvc:
+    favicon:
+      enabled: false
+
+server:
+  contextPath: /${spring.application.name}
+
+logging:
+  file: logs/${spring.application.name}.log
+  level:
+  ROOT: INFO
+
+banner:
+  location: banner.txt
