@@ -1,20 +1,13 @@
 package com.example.jennydegtiar.nuditydetection;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.jennydegtiar.nuditydetection.com.example.jennydegtiar.nuditydetection.encryptor.EncryptorFacade;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
-//import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
@@ -23,16 +16,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+//import com.stfalcon.frescoimageviewer.ImageViewer;
 
 public class MainActivity extends AppCompatActivity {
     private SimpleDraweeView draweeView;
     private List<String> fileNames = new ArrayList<>();
     private String cameraFolderBase = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/";
     private int cameraPicIndex;
-
+    private int numberOfFilesToPresent = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,25 +47,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //int length = files.length;
-        int length = 3;
         int i =0;
         int counter = 0;
-        while (i < files.length && counter < length) {
+        while (i < files.length && counter < numberOfFilesToPresent) {
             if (!files[i].isDirectory()) {
                 counter++;
-                if (files[i].getName().contains("WA0004")) {
-                    try {
-                        EncryptorFacade.decryptImage(files[i].getAbsolutePath(), "123", "1234", "5555");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ImageWriteException e) {
-                        e.printStackTrace();
-                    } catch (ImageReadException e) {
-                        e.printStackTrace();
+                String tempImageFile = null;
+                try {
+                    if(isNotTemporaryFile(files[i]) && EncryptorFacade.isImageEncrypted(files[i].getAbsolutePath())) {
+                        tempImageFile = EncryptorFacade.decryptImageToTemporaryImage(files[i].getAbsolutePath(), "123", "1234", "5555");
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ImageWriteException e) {
+                    e.printStackTrace();
+                } catch (ImageReadException e) {
+                    e.printStackTrace();
                 }
-                fileNames.add(files[i].getName());
+                if(tempImageFile == null && isNotTemporaryFile(files[i])) {
+                    fileNames.add(files[i].getName());
+                } else {
+                    fileNames.add(tempImageFile.substring(tempImageFile.lastIndexOf("/")+1));
+                }
             }
             i++;
         }
@@ -118,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
         draweeView.setImageURI(imageUri);
 
 
+    }
+
+    private boolean isNotTemporaryFile(File file) {
+        return !file.getAbsolutePath().endsWith("_temp.jpg");
     }
 
 }

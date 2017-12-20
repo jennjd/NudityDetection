@@ -1,5 +1,7 @@
 package com.example.jennydegtiar.nuditydetection.com.example.jennydegtiar.nuditydetection.encryptor;
 
+import android.util.Log;
+
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 
@@ -9,9 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,6 +96,15 @@ public class EncryptorFacade {
         JPEGEncryptor encryptor = new JPEGEncryptor(sourcePhone + password);
         encryptor.decryptFile(imagePath, imagePath);
         addPhoneToMetadata(imagePath, myPhone);
+    }
+
+    public static String decryptImageToTemporaryImage(String imagePath, String password, String sourcePhone, String myPhone) throws IOException, ImageWriteException, ImageReadException {
+        JPEGEncryptor encryptor = new JPEGEncryptor(sourcePhone + password);
+        String imageTemporaryPath = imagePath.replaceAll(".jpg", "") + "_temp" + ".jpg";
+        encryptor.decryptFile(imagePath, imageTemporaryPath);
+        addPhoneToMetadata(imagePath, myPhone);
+        Log.i("","Decryting " + imagePath + " TO: " + imageTemporaryPath);
+        return imageTemporaryPath;
     }
 
 }
