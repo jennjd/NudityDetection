@@ -11,11 +11,16 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.jennydegtiar.nuditydetection.com.example.jennydegtiar.nuditydetection.encryptor.EncryptorFacade;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 //import com.stfalcon.frescoimageviewer.ImageViewer;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +30,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private SimpleDraweeView draweeView;
     private List<String> fileNames = new ArrayList<>();
-    private String cameraFolderBase = "/storage/emulated/0/DCIM/Camera/";
+    private String cameraFolderBase = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/";
     private int cameraPicIndex;
 
     @Override
@@ -48,10 +53,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        for (File inFile : files) {
-            if (!inFile.isDirectory()) {
-                fileNames.add(inFile.getName());
+        //int length = files.length;
+        int length = 3;
+        int i =0;
+        int counter = 0;
+        while (i < files.length && counter < length) {
+            if (!files[i].isDirectory()) {
+                counter++;
+                if (files[i].getName().contains("WA0004")) {
+                    try {
+                        EncryptorFacade.decryptImage(files[i].getAbsolutePath(), "123", "1234", "5555");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ImageWriteException e) {
+                        e.printStackTrace();
+                    } catch (ImageReadException e) {
+                        e.printStackTrace();
+                    }
+                }
+                fileNames.add(files[i].getName());
             }
+            i++;
         }
 
 //        Uri imageUri = Uri.parse("https://i.imgur.com/tGbaZCY.jpg");
